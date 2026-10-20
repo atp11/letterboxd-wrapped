@@ -82,13 +82,14 @@ def compute_basic_stats(export: LetterboxdExport) -> dict[str, Any]:
             best_decade_avg = row["avg_rating"]
             best_decade = row
 
-    top_rated = sorted(
-        [f for f in watched if f.rating is not None],
-        key=lambda f: (-(f.rating or 0), f.name),
-    )
-    worst_rated = sorted(
-        [f for f in watched if f.rating is not None],
-        key=lambda f: ((f.rating or 0), f.name),
+    rated_films = [f for f in watched if f.rating is not None]
+    worst_rated = sorted(rated_films, key=lambda f: ((f.rating or 0), f.name))
+    # Todas las que comparten la nota máxima (p. ej. todas las 5★), no un top N
+    max_rating = max((f.rating for f in rated_films), default=None)
+    all_top_rated = (
+        sorted([f for f in rated_films if f.rating == max_rating], key=lambda f: f.name)
+        if max_rating is not None
+        else []
     )
 
     # Diario
@@ -153,8 +154,13 @@ def compute_basic_stats(export: LetterboxdExport) -> dict[str, Any]:
         "top_years": years_table[:10],
         "best_rated": [
             {"name": f.name, "year": f.year, "rating": f.rating, "uri": f.letterboxd_uri}
-            for f in top_rated[:30]
+            for f in all_top_rated
         ],
+        "best_rated_note": (
+            f"Todas las películas con {max_rating}★ ({len(all_top_rated)})"
+            if max_rating is not None
+            else None
+        ),
         "worst_rated": [
             {"name": f.name, "year": f.year, "rating": f.rating, "uri": f.letterboxd_uri}
             for f in worst_rated[:30]

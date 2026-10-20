@@ -187,16 +187,21 @@ footer { text-align: center; color: var(--muted); padding: 2rem 1rem 3rem; font-
   <h2>Puntuaciones</h2>
   <p class="lead">Escala Letterboxd de 0,5 a 5. Las medias usan solo películas puntuadas.</p>
   <div class="chart">{{ charts.ratings | safe }}</div>
-  <div class="table-wrap">
+  {% if best_rated %}
+  <h3 style="margin:1.25rem 0 .5rem;font-size:1.05rem;color:var(--accent);">
+    {{ best_rated_note or "Mejor puntuadas" }}
+  </h3>
+  <div class="table-wrap" style="max-height:640px;">
     <table>
       <thead><tr><th>Película</th><th>Año</th><th>Nota</th></tr></thead>
       <tbody>
-      {% for f in best_rated[:15] %}
+      {% for f in best_rated %}
         <tr><td>{{ f.name }}</td><td>{{ f.year }}</td><td>{{ f.rating }}</td></tr>
       {% endfor %}
       </tbody>
     </table>
   </div>
+  {% endif %}
 </section>
 
 <section id="tiempo">
@@ -290,6 +295,7 @@ def write_html(
         generated=datetime.now().strftime("%Y-%m-%d %H:%M"),
         resumen=basic["resumen"],
         best_rated=basic.get("best_rated") or [],
+        best_rated_note=basic.get("best_rated_note"),
         charts=charts,
         rankings=rankings,
         coverage=coverage,
