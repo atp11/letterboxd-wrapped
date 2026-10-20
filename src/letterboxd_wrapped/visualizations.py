@@ -23,7 +23,7 @@ def _layout(**kwargs: Any) -> dict[str, Any]:
     base = dict(
         paper_bgcolor="rgba(0,0,0,0)",
         plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(family="IBM Plex Sans, Helvetica, sans-serif", color=PALETTE["text"]),
+        font=dict(family="Libron, Georgia, serif", color=PALETTE["text"]),
         margin=dict(l=40, r=20, t=40, b=40),
         xaxis=dict(gridcolor="#2a2a30", zeroline=False),
         yaxis=dict(gridcolor="#2a2a30", zeroline=False),

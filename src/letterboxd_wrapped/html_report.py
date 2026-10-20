@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import shutil
 from datetime import datetime
+from importlib import resources
 from pathlib import Path
 from typing import Any
 
@@ -11,6 +13,27 @@ from jinja2 import Template
 from letterboxd_wrapped.models import LetterboxdExport
 from letterboxd_wrapped.visualizations import build_all_charts
 
+_FONT_FILES = (
+    "Libron-Regular.woff2",
+    "Libron-Italic.woff2",
+    "Libron-Bold.woff2",
+    "Libron-BoldItalic.woff2",
+    "OFL.txt",
+)
+
+
+def _copy_fonts(output_dir: Path) -> Path:
+    """Copia Libron (OFL) junto al HTML para uso offline."""
+    fonts_dir = output_dir / "fonts"
+    fonts_dir.mkdir(parents=True, exist_ok=True)
+    package = resources.files("letterboxd_wrapped") / "assets" / "fonts"
+    for name in _FONT_FILES:
+        src = package / name
+        if src.is_file():
+            shutil.copy2(src, fonts_dir / name)
+    return fonts_dir
+
+
 TEMPLATE = Template(
     r"""<!DOCTYPE html>
 <html lang="es">
@@ -18,10 +41,35 @@ TEMPLATE = Template(
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Letterboxd Wrapped — {{ username }}</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Libre+Baskerville:wght@700&display=swap" rel="stylesheet"/>
 <style>
+@font-face {
+  font-family: "Libron";
+  src: url("fonts/Libron-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libron";
+  src: url("fonts/Libron-Italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libron";
+  src: url("fonts/Libron-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Libron";
+  src: url("fonts/Libron-BoldItalic.woff2") format("woff2");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
 :root {
   --bg: #0b0b0d;
   --bg2: #141418;
@@ -31,12 +79,13 @@ TEMPLATE = Template(
   --accent: #ff8000;
   --accent2: #40bcf4;
   --line: #2c2c34;
+  --font: "Libron", Georgia, "Times New Roman", serif;
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
-  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-family: var(--font);
   background:
     radial-gradient(1200px 600px at 10% -10%, rgba(255,128,0,.18), transparent 50%),
     radial-gradient(900px 500px at 90% 0%, rgba(64,188,244,.12), transparent 45%),
@@ -55,7 +104,8 @@ header.hero {
   margin: 0 auto;
 }
 .brand {
-  font-family: "Libre Baskerville", Georgia, serif;
+  font-family: var(--font);
+  font-weight: 700;
   font-size: clamp(2.6rem, 7vw, 4.8rem);
   letter-spacing: -0.02em;
   margin: 0 0 .4rem;
@@ -90,7 +140,8 @@ nav a:hover { color: var(--accent); }
 main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
 section { margin: 3rem 0; animation: rise .7s ease both; }
 h2 {
-  font-family: "Libre Baskerville", Georgia, serif;
+  font-family: var(--font);
+  font-weight: 700;
   font-size: 1.7rem;
   margin: 0 0 .75rem;
   border-left: 4px solid var(--accent);
@@ -126,7 +177,7 @@ table {
   background: var(--card); border-radius: 12px; overflow: hidden;
 }
 th, td { padding: .55rem .7rem; border-bottom: 1px solid var(--line); text-align: left; }
-th { color: var(--accent); font-weight: 600; position: sticky; top: 0; background: #1c1c22; }
+th { color: var(--accent); font-weight: 700; position: sticky; top: 0; background: #1c1c22; }
 tr:hover td { background: rgba(255,128,0,.06); }
 .table-wrap { overflow: auto; max-height: 420px; border-radius: 12px; border: 1px solid var(--line); }
 .curiosity {
@@ -270,7 +321,7 @@ footer { text-align: center; color: var(--muted); padding: 2rem 1rem 3rem; font-
 </section>
 </main>
 <footer>
-  Informe local · Letterboxd Wrapped {{ version }} · Fuentes: exportación Letterboxd, IMDb datasets{% if coverage and coverage.sources.wikidata %}, Wikidata{% endif %}{% if coverage and coverage.sources.tmdb %}, TMDB{% endif %}.
+  Informe local · Letterboxd Wrapped {{ version }} · Tipografía: Libron (OFL) · Fuentes de datos: exportación Letterboxd, IMDb datasets{% if coverage and coverage.sources.wikidata %}, Wikidata{% endif %}{% if coverage and coverage.sources.tmdb %}, TMDB{% endif %}.
 </footer>
 </body>
 </html>
@@ -289,6 +340,7 @@ def write_html(
 ) -> Path:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    _copy_fonts(path.parent)
     charts = build_all_charts(basic, rankings)
     html = TEMPLATE.render(
         username=export.username,
