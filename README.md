@@ -2,6 +2,40 @@
 
 Análisis tipo *Wrapped* a partir de una exportación ZIP de Letterboxd: estadísticas básicas, enriquecimiento con datasets públicos de IMDb (y opcionalmente Wikidata/TMDB), rankings cinéfilos, informe HTML y libro Excel.
 
+## Capturas del informe HTML
+
+Ejemplo del informe generado (`letterboxd_wrapped.html`). Las imágenes están en [`docs/screenshots/`](docs/screenshots/).
+
+### Resumen y puntuaciones
+
+Tarjetas del catálogo (vistas, puntuadas, media, diario, watchlist…) y distribución de notas en la escala Letterboxd (0,5–5).
+
+![Resumen del catálogo y distribución de puntuaciones](docs/screenshots/resumen.png)
+
+### Décadas y actividad
+
+Volumen de películas vs nota media por década de estreno, y evolución del diario por mes (distinto del año de estreno).
+
+![Décadas: volumen vs nota media, y actividad del diario](docs/screenshots/decadas-actividad.png)
+
+### Personas
+
+Rankings de dirección, actores y actrices más vistos; cada película cuenta una sola vez por persona.
+
+![Dirección y actores más vistos](docs/screenshots/personas.png)
+
+### Géneros y franquicias
+
+Géneros más frecuentes y tabla de franquicias/colecciones (vistas, nota media, puntuadas).
+
+![Géneros más frecuentes y franquicias](docs/screenshots/generos-franquicia.png)
+
+### Curiosidades
+
+Hallazgos del perfil: década favorita, personas, país, género, franquicia, película más revisionada, etc.
+
+![Curiosidades del perfil](docs/screenshots/curiosidades.png)
+
 ## Requisitos
 
 - Python 3.11+
