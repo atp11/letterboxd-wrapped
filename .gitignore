@@ -16,7 +16,6 @@ data/imdb/
 # Salidas y datos personales
 output/
 *.xlsx
-!letterboxd_wrapped_parcial.xlsx
 letterboxd-*.zip
 .env.local
 config.local.*
